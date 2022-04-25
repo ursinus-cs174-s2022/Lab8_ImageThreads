@@ -1,7 +1,16 @@
 #include <stdio.h>
 #include <cstring>
-#include <map>
+#include <thread>
+#include <chrono>
+#include <mutex>
+#include <iostream>
+#include <functional>
 #include "simplecanvas/simplecanvas.h"
+
+using namespace std;
+
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::milliseconds milliseconds;
 
 
 /**
@@ -14,7 +23,6 @@
  * @param pixelOut 
  */
 void mean(SimpleCanvas& imagein, int x, int y, int kernelWidth, uint8_t* pixelOut) {
-    printf("MEAN\n");
     double num = 0;
     double total[3];
     for (int k = 0; k < 3; k++) {
@@ -144,10 +152,7 @@ void filterImage(SimpleCanvas& imagein, SimpleCanvas& imageout, Parameters param
     uint8_t pixel[3];
     for (int y = 0; y < imagein.height; y++) {
         for (int x = 0; x < imagein.width; x++) {
-            printf("%i, %i\n", y, x);
-            printf("Calling filter\n");
             params.filter(imagein, x, y, params.kernelWidth, pixel);
-            printf("Finished filter\n");
             imageout.setPixel(x, y, pixel[0], pixel[1], pixel[2]);
         }
     }
@@ -158,7 +163,13 @@ int main(int argc, char** argv) {
     Parameters params = parseArgs(argc, argv);
     SimpleCanvas imagein(params.inpath);
     SimpleCanvas imageout(params.inpath);
+
+    Clock::time_point tic = Clock::now();
     filterImage(imagein, imageout, params);
+    Clock::time_point toc = Clock::now();
+    milliseconds ms = std::chrono::duration_cast<milliseconds>(toc-tic);
+    cout << "Time elapsed: " << ms.count()  << "ms\n";
+
     imageout.write(params.outpath);
     return 0;
 }
