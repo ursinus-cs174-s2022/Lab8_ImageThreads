@@ -18,8 +18,8 @@ typedef std::chrono::milliseconds milliseconds;
 struct Parameters {
     const char* inpath;
     const char* outpath;
-    float s; // Spatial sigma
-    float b; // Grayscale sigma
+    float s = 0; // Spatial sigma
+    float b = 0; // Grayscale sigma
     int nthreads=1;
     int reps=1; // Number of repetitions of the filter
 };
